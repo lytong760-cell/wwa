@@ -1,0 +1,9 @@
+import io
+
+let nums = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+
+let evens   = nums.filter(x => x % 2 == 0)
+let squares = evens.map(x => x * x)
+let total   = squares.reduce((acc, x) => acc + x, 0)
+
+io.println("Sum of squares of evens: " + total)

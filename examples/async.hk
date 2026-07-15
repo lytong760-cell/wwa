@@ -1,0 +1,12 @@
+import io
+
+async func fetchData(id: int) -> string {
+    return "Data for ID: " + id
+}
+
+async func main() {
+    let result = await fetchData(42)
+    io.println(result)
+}
+
+await main()

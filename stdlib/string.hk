@@ -1,0 +1,43 @@
+func length(s: string) -> int {
+    return __native_len__(s)
+}
+
+func upper(s: string) -> string {
+    return __native_upper__(s)
+}
+
+func lower(s: string) -> string {
+    return __native_lower__(s)
+}
+
+func split(s: string, delim: string) -> list {
+    return __native_split__(s, delim)
+}
+
+func join(arr: list, delim: string) -> string {
+    return __native_join__(arr, delim)
+}
+
+func trim(s: string) -> string {
+    return __native_trim__(s)
+}
+
+func replace(s: string, old: string, new: string) -> string {
+    return __native_replace__(s, old, new)
+}
+
+func startsWith(s: string, prefix: string) -> bool {
+    return __native_startswith__(s, prefix)
+}
+
+func endsWith(s: string, suffix: string) -> bool {
+    return __native_endswith__(s, suffix)
+}
+
+func contains(s: string, sub: string) -> bool {
+    return __native_contains__(s, sub)
+}
+
+func indexOf(s: string, sub: string) -> int {
+    return __native_indexof__(s, sub)
+}

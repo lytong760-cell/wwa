@@ -1,0 +1,17 @@
+import io
+
+func divide(a: int, b: int) -> float {
+    if b == 0 {
+        throw Error("Division by zero")
+    }
+    return a / b
+}
+
+try {
+    let result = divide(10, 0)
+    io.println(result)
+} catch (e: Error) {
+    io.println("Caught error: " + e.message)
+} finally {
+    io.println("Done.")
+}
