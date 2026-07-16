@@ -1,0 +1,32 @@
+const PI = 3.141592653589793
+const E = 2.718281828459045
+
+func sqrt(n: float) -> float {
+    return __native_sqrt__(n)
+}
+
+func pow(base: float, exp: float) -> float {
+    return __native_pow__(base, exp)
+}
+
+func floor(n: float) -> float {
+    return __native_floor__(n)
+}
+
+func ceil(n: float) -> float {
+    return __native_ceil__(n)
+}
+
+func abs(n: float) -> float {
+    return __native_abs__(n)
+}
+
+func min(a: float, b: float) -> float {
+    if a < b { return a }
+    return b
+}
+
+func max(a: float, b: float) -> float {
+    if a > b { return a }
+    return b
+}

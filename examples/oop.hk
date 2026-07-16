@@ -1,0 +1,26 @@
+import io
+
+class Animal {
+    name: string
+
+    constructor(name: string) {
+        self.name = name
+    }
+
+    func speak() -> string {
+        return self.name + " makes a sound"
+    }
+}
+
+class Dog extends Animal {
+    constructor(name: string) {
+        super(name)
+    }
+
+    func speak() -> string {
+        return self.name + " says Woof!"
+    }
+}
+
+let d = new Dog("Rex")
+io.println(d.speak())

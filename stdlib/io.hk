@@ -1,0 +1,36 @@
+func println(value) {
+    print(value)
+    print("\n")
+}
+
+func print(value) {
+    __native_print__(value)
+}
+
+func readLine() -> string {
+    return __native_input__()
+}
+
+func open(path: string, mode: string) -> File {
+    return File(path, mode)
+}
+
+class File {
+    constructor(path: string, mode: string) {
+        self.path = path
+        self.mode = mode
+        self.handle = null
+    }
+
+    func read() -> string {
+        return __native_read__(self.path)
+    }
+
+    func write(content: string) {
+        __native_write__(self.path, content)
+    }
+
+    func close() {
+        self.handle = null
+    }
+}
