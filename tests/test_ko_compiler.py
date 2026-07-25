@@ -63,6 +63,36 @@ class KoCompilerTests(unittest.TestCase):
         exec(code, namespace)
         self.assertEqual(namespace["result"], 5)
 
+    def test_version_1_3_main_block_class_and_index_syntax(self):
+        source = """**Import**($Random)@also%*random!`global`:random
+Hero !class [
+    @private [
+        string("A")*name
+        int(100)*hp
+        ('Kiem', 'Khien')*inventory
+
+        use_item() [
+            int(1)*item_index
+            <printf>^("{name}:{inventory<{item_index}>}:{hp}")
+        ]
+    ]
+]
+[
+    *Hero*p1
+    $p1*use_item()
+]
+"""
+        code = compile_ko_source(source, enforce_main=True)
+        namespace = {}
+        exec(code, namespace)
+        self.assertIn("p1", namespace)
+
+    def test_input_declaration_and_booling_syntax(self):
+        source = 'booling(\\True\\)*enabled\n<input>("Name: ")&=string("")*name\n'
+        code = compile_ko_source(source)
+        self.assertIn("enabled = bool(True)", code)
+        self.assertIn("name = input(\"Name: \")", code)
+
 
 if __name__ == "__main__":
     unittest.main()
