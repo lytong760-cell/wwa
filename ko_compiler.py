@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import argparse
+import ast
 import os
 import re
 import sys
@@ -180,6 +181,27 @@ def compile_ko_source(source: str, file_name: str = "<stdin>", enforce_main: boo
             globals_list.append(name)
             flush_line(f"global {name}")
 
+    def open_block(header: str, scope: str = "block") -> None:
+        nonlocal indent_level, pending_indent
+        flush_line(header)
+        block_stack.append(scope)
+        indent_level += 4
+        pending_indent = indent_level
+
+    def parse_loop_header(loop_expr: str) -> List[str]:
+        expression = _translate_expression(loop_expr.strip())
+        assignment_match = re.fullmatch(r"([A-Za-z_][A-Za-z0-9_]*)\s*=\s*(.+)", expression)
+        if assignment_match:
+            name, value = assignment_match.groups()
+            return [f"{name} = {value}", "while True:"]
+
+        step_match = re.fullmatch(r"([A-Za-z_][A-Za-z0-9_]*)\s*([+-])\s*(.+)", expression)
+        if step_match:
+            name, operator, value = step_match.groups()
+            return [f"{name} = globals().get('{name}', 0)", "while True:", f"{name} = {name} {operator} ({value})"]
+
+        return ["while True:"]
+
     for lineno, raw_line in enumerate(lines, start=1):
         line = raw_line.strip()
         if not line:
@@ -211,50 +233,29 @@ def compile_ko_source(source: str, file_name: str = "<stdin>", enforce_main: boo
             continue
         if re.match(r"^if\s*\((.*)\)\s*\[$", line):
             condition = re.match(r"^if\s*\((.*)\)\s*\[$", line).group(1)
-            flush_line(f"if {condition}:")
-            block_stack.append("block")
-            indent_level += 4
-            pending_indent = indent_level
+            open_block(f"if {_translate_expression(condition)}:")
             continue
         if re.match(r"^elif\s*\((.*)\)\s*\[$", line):
             condition = re.match(r"^elif\s*\((.*)\)\s*\[$", line).group(1)
-            flush_line(f"elif {condition}:")
-            block_stack.append("block")
-            indent_level += 4
-            pending_indent = indent_level
+            open_block(f"elif {_translate_expression(condition)}:")
             continue
         if re.match(r"^else\s*\[$", line):
-            flush_line("else:")
-            block_stack.append("block")
-            indent_level += 4
-            pending_indent = indent_level
+            open_block("else:")
             continue
         if re.match(r"^<if>\((.*)\)\s*\[$", line):
             condition = re.match(r"^<if>\((.*)\)\s*\[$", line).group(1)
-            flush_line(f"if {condition}:")
-            block_stack.append("block")
-            indent_level += 4
-            pending_indent = indent_level
+            open_block(f"if {_translate_expression(condition)}:")
             continue
         if re.match(r"^<elif>\((.*)\)\s*\[$", line):
             condition = re.match(r"^<elif>\((.*)\)\s*\[$", line).group(1)
-            flush_line(f"elif {condition}:")
-            block_stack.append("block")
-            indent_level += 4
-            pending_indent = indent_level
+            open_block(f"elif {_translate_expression(condition)}:")
             continue
         if re.match(r"^<else>\s*\[$", line):
-            flush_line("else:")
-            block_stack.append("block")
-            indent_level += 4
-            pending_indent = indent_level
+            open_block("else:")
             continue
         if re.match(r"^<if<else>>\((.*)\)\s*\[$", line):
             condition = re.match(r"^<if<else>>\((.*)\)\s*\[$", line).group(1)
-            flush_line(f"if {condition}:")
-            block_stack.append("block")
-            indent_level += 4
-            pending_indent = indent_level
+            open_block(f"if {_translate_expression(condition)}:")
             continue
         if re.match(r"^([A-Za-z_][A-Za-z0-9_]*)\s*!class\s*\[$", line):
             class_name = re.match(r"^([A-Za-z_][A-Za-z0-9_]*)\s*!class\s*\[$", line).group(1)
@@ -270,32 +271,33 @@ def compile_ko_source(source: str, file_name: str = "<stdin>", enforce_main: boo
         if re.match(r"^\*\*Loop\*\*\s*<for\.f\.whle>@also\s*\[$", line, re.IGNORECASE):
             condition = pending_loop_condition or "True"
             pending_loop_condition = None
-            flush_line(f"while {condition}:")
-            block_stack.append("block")
-            indent_level += 4
-            pending_indent = indent_level
+            open_block(f"while {_translate_expression(condition)}:")
             continue
-        if re.match(r"^\*\*Loop\*\*\s*<for>\(\*([A-Za-z_][A-Za-z0-9_]*=.*)\)\s*\[$", line, re.IGNORECASE):
-            init_expr = re.match(r"^\*\*Loop\*\*\s*<for>\(\*([A-Za-z_][A-Za-z0-9_]*=.*)\)\s*\[$", line, re.IGNORECASE).group(1)
-            flush_line(init_expr)
-            flush_line("while True:")
+        if re.match(r"^\*\*Loop\*\*\s*<for>\(\*(.+)\)\s*\[$", line, re.IGNORECASE):
+            loop_expr = re.match(r"^\*\*Loop\*\*\s*<for>\(\*(.+)\)\s*\[$", line, re.IGNORECASE).group(1)
+            loop_lines = parse_loop_header(loop_expr)
+            body_lines = []
+            if "while True:" in loop_lines:
+                header_index = loop_lines.index("while True:")
+                for loop_line in loop_lines[:header_index]:
+                    flush_line(loop_line)
+                flush_line("while True:")
+                body_lines = loop_lines[header_index + 1:]
+            else:
+                flush_line(loop_lines[-1])
             block_stack.append("block")
             indent_level += 4
+            for loop_line in body_lines:
+                flush_line(loop_line)
             pending_indent = indent_level
             continue
         if re.match(r"^loop\s*\((.*)\)\s*\[$", line, re.IGNORECASE):
             condition = re.match(r"^loop\s*\((.*)\)\s*\[$", line, re.IGNORECASE).group(1)
-            flush_line(f"while {condition}:")
-            block_stack.append("block")
-            indent_level += 4
-            pending_indent = indent_level
+            open_block(f"while {_translate_expression(condition)}:")
             continue
         if re.match(r"^while\s*\((.*)\)\s*\[$", line, re.IGNORECASE):
             condition = re.match(r"^while\s*\((.*)\)\s*\[$", line, re.IGNORECASE).group(1)
-            flush_line(f"while {condition}:")
-            block_stack.append("block")
-            indent_level += 4
-            pending_indent = indent_level
+            open_block(f"while {_translate_expression(condition)}:")
             continue
         if re.match(r"^([A-Za-z_][A-Za-z0-9_]*)\s*\((.*)\)\s*\[$", line):
             match = re.match(r"^([A-Za-z_][A-Za-z0-9_]*)\s*\((.*)\)\s*\[$", line)
@@ -487,7 +489,16 @@ def compile_ko_source(source: str, file_name: str = "<stdin>", enforce_main: boo
 def compile_ko_file(path: str) -> str:
     with open(path, "r", encoding="utf-8") as handle:
         source = handle.read()
-    return compile_ko_source(source, file_name=path, enforce_main=True)
+    code = compile_ko_source(source, file_name=path, enforce_main=True)
+    try:
+        ast.parse(code, filename=path)
+    except SyntaxError as exc:
+        raise KoCompileError(
+            f"Generated Python is invalid: {exc.msg}",
+            line=exc.lineno or 0,
+            column=exc.offset or 0,
+        ) from exc
+    return code
 
 
 def main(argv: Optional[List[str]] = None) -> int:

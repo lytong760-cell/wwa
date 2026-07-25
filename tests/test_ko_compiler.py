@@ -1,6 +1,7 @@
+import tempfile
 import unittest
 
-from ko_compiler import compile_ko_source
+from ko_compiler import KoCompileError, compile_ko_file, compile_ko_source
 
 
 class KoCompilerTests(unittest.TestCase):
@@ -92,6 +93,32 @@ Hero !class [
         code = compile_ko_source(source)
         self.assertIn("enabled = bool(True)", code)
         self.assertIn("name = input(\"Name: \")", code)
+
+    def test_loop_for_without_space_and_increment_form(self):
+        source = """[
+    **Loop**<for>(*i+1) [
+        <if>(i % 2 == 0) [
+            <printf>^("{i} chan")
+        ]
+        <else> [
+            <printf>^("{i} le")
+        ]
+    ]
+]
+"""
+        code = compile_ko_source(source, enforce_main=True)
+        self.assertIn("i = globals().get('i', 0)", code)
+        self.assertIn("while True:", code)
+        self.assertIn("i = i + (1)", code)
+        self.assertIn('print(f"{i} chan")', code)
+
+    def test_compile_file_reports_generated_syntax_errors(self):
+        with tempfile.NamedTemporaryFile("w", suffix=".ko", delete=False, encoding="utf-8") as handle:
+            handle.write('[\n    <printf>^("{broken)\n]\n')
+            path = handle.name
+
+        with self.assertRaises(KoCompileError):
+            compile_ko_file(path)
 
 
 if __name__ == "__main__":
