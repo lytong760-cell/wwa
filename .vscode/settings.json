@@ -1,3 +1,9 @@
 {
-    "livePreview.defaultPreviewPath": "/Website/index.html"
+  "livePreview.defaultPreviewPath": "/website/index.html",
+  "editor.formatOnSave": true,
+  "editor.quickSuggestions": {
+    "other": true,
+    "comments": true,
+    "strings": true
+  }
 }

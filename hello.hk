@@ -1,0 +1,7 @@
+import io
+
+func main() {
+    io.println("Hello, Hanaka!")
+}
+
+main()

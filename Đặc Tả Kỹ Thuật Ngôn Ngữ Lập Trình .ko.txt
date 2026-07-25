@@ -1,0 +1,244 @@
+﻿BẢN ĐẶC TẢ KỸ THUẬT NGÔN NGỮ LẬP TRÌNH .ko
+Phiên bản: 1.2 (Cập nhật chuẩn hóa bởi Phong)
+I. TỔNG QUAN & TRIẾT LÝ THIẾT KẾ
+.ko là ngôn ngữ lập trình đa mô hình (Multi-paradigm), kết hợp giữa lập trình hướng đối tượng (OOP), lập trình thủ tục (Procedural) và các thao tác điều khiển bộ nhớ cấp thấp (Low-level Memory Access).
+1. Triết lý cú pháp cốt lõi
+* Tách biệt tuyệt đối giữa Code và Data: Khối lệnh (Code Block / Scope) sử dụng duy nhất ngoặc vuông [ ]. Dữ liệu và Cấu trúc dữ liệu sử dụng ngoặc tròn ( ) và ngoặc nhọn { }.
+* Ký tự trung tâm *: Dấu * được sử dụng xuyên suốt làm toán tử chính cho việc Khởi tạo biến, Gọi hàm, và Định danh Class.
+* Thẻ lệnh và Ngữ nghĩa < >: Mọi thẻ thực thi hệ thống, truy xuất chỉ mục, hoặc toán tử thao tác trạng thái đều được bao bọc trong cặp ngoặc nhọn < >.
+* Biến đối tượng $: Dùng tiền tố $ để trỏ đến các instance hoặc module đã được cấp phát.
+II. KIỂU DỮ LIỆU CƠ BẢN (PRIMITIVE TYPES)
+Ngôn ngữ .ko định nghĩa các kiểu dữ liệu cơ bản theo cú pháp: kiểu_dữ_liệu(giá_trị)*tên_biến.
+1. Danh sách kiểu dữ liệu
+Kiểu dữ liệu
+	Mô tả
+	Ví dụ cú pháp
+	int
+	Số nguyên
+	int(100)*hp
+	freal
+	Số thực / Float (dùng mặc định trong biến đếm vòng lặp)
+	freal(3.14)*pi
+	string
+	Chuỗi ký tự
+	string("Phong")*name
+	booling
+	Kiểu logic (chứa giá trị thẻ \True\ hoặc \False\)
+	booling(\True\)*is_active
+	byte
+	Dữ liệu dạng Byte / Cấp thấp
+	byte("hello")*a
+	III. CẤU TRÚC DỮ LIỆU & TRUY XUẤT (DATA STRUCTURES)
+1. Định nghĩa Cấu trúc Dữ liệu
+.ko sử dụng kết hợp giữa ngoặc tròn () và ngoặc nhọn {} để khai báo mảng, danh sách lồng và dictionary mà không làm xung đột với khối lệnh [].
+| Mảng số nguyên / Tuple cơ bản |
+(1, 2)*a
+
+| Mảng chuỗi / ký tự |
+('a', 'b')*b
+
+| Nested List (Danh sách lồng nhau) |
+(1('a', 'a'))*list
+
+| Dictionary (Key-Value) |
+(1{'a'})*dic
+
+
+2. Cú pháp Truy xuất Dữ liệu
+Toán tử truy xuất dữ liệu nằm gọn trong các thẻ ngoặc nhọn < > và ngoặc nhọn kép < < > >:
+* Truy xuất theo Chỉ mục Index (0-based): Dùng < index >
+<printf>^(list<1>)      | Lấy phần tử ở vị trí index 1 |
+<printf>^(dic<1>)       | Lấy giá trị theo index/key trong dictionary |
+
+
+* Truy xuất Mảng lồng nhau (Nested Access): Dùng < < index > >
+<printf>^(list<1<2>>)   | Lấy phần tử index 1 của mảng cha, sau đó lấy index 2 của mảng con |
+
+
+* Truy xuất Đối chiếu Dữ liệu (Lookup Key-Value): Dùng { key { value } }
+<printf>^(list{1{'a'}}) | Đối chiếu dữ liệu dựa theo Key 1 và Value 'a' |
+
+
+IV. NHẬP / XUẤT DỮ LIỆU & BỘ NHỚ (INPUT, OUTPUT & MEMORY)
+1. Cú pháp In dữ liệu (Output)
+Ngôn ngữ .ko phân biệt rõ ràng giữa in dữ liệu tĩnh và in dữ liệu động (Format):
+   * In dữ liệu cố định (Tĩnh):
+<print>kiểu_dữ_liệu^(dữ_liệu)
+| Ví dụ: <print>string^("Xin chao") |
+
+
+   * In dữ liệu không cố định (Động / Formatted String):
+<print>format^(dữ_liệu)
+| Hoặc dùng thẻ rút gọn: |
+<printf>^(dữ_liệu)
+| Ví dụ: <printf>^("Player HP: {hp}") |
+
+
+2. Cú pháp Nhập dữ liệu (Input)
+Thẻ lệnh <input> hỗ trợ 3 hình thức tương tác nhập liệu từ bàn phím:
+      * Chỉ hiển thị giao diện Prompt (không lưu trữ):
+<input>("nhap")
+| Chỉ hiển thị giao diện/thông báo nhập "nhap", không gán vào biến nào |
+
+
+      * Ghi đè trực tiếp lên biến dạng string đã có:
+string("x")*x
+<input>(x)
+| Nếu người dùng nhập "Hello", giá trị biến x sẽ bị ghi đè thành "Hello" |
+
+
+      * Hứng dữ liệu bằng toán tử gán &=:
+         * Cách 1: Khai báo và khởi tạo biến mới ngay trong lệnh Input:
+<input>("Nhập tên của bạn: ")&=string("")*name
+
+
+         * Cách 2: Gán dữ liệu vào biến đã khởi tạo từ trước:
+string("")*name
+<input>("Nhập tên của bạn: ")&=name
+
+
+3. Thao tác Bộ nhớ (<memory>)
+.ko hỗ trợ truy cập và can thiệp ô nhớ trực tiếp của biến:
+int(0)*h
+<memory>^h               | Trỏ/Thao tác trực tiếp vào vùng nhớ của biến h |
+
+
+4. Cập nhật Trạng thái (<now>)
+Toán tử <now> ghi đè hoặc cập nhật trực tiếp giá trị vào biến mục tiêu:
+<now>(giá_trị)>tên_biến
+| Ví dụ: <now>(100)>hp |
+
+
+V. CẤU TRÚC ĐIỀU KHIỂN (CONTROL FLOW)
+1. Rẽ nhánh (If / Elif / Else)
+.ko hỗ trợ rẽ nhánh đơn, rẽ nhánh nhiều điều kiện (elif) và dạng gộp gán thẻ:
+            * Rẽ nhánh nhiều điều kiện (if / elif / else):
+<if>(điều_kiện_1) [
+   | Khối lệnh khi điều kiện 1 True |
+]
+<if<else>>(điều_kiện_2) [
+   | Khối lệnh khi điều kiện 2 True |
+]
+<else> [
+   | Khối lệnh khi tất cả điều kiện trên False |
+]
+
+
+            * Cú pháp gộp trực tiếp (if / else):
+<if<else>>(điều_kiện) [
+   | Khối lệnh xử lý |
+]
+
+
+2. Vòng lặp (Loop System)
+Mọi vòng lặp trong .ko đều bắt đầu bằng từ khóa **Loop**:
+               * Vòng lặp đếm (for):
+**Loop** <for>(*x=1) [
+   <printf>^("Gia tri x: {x}")
+]
+
+
+               * Vòng lặp điều kiện (while): Sử dụng kết hợp với nhãn @loop()
+@loop(x <= 10)
+**Loop** <for.f.whle>@also [
+   <printf>^("Lap: {x}")
+   <now>(x + 1)>x
+]
+
+
+VI. NẠP MODULE & THƯ VIỆN (IMPORT SYSTEM)
+Cú pháp nạp thư viện quy định phạm vi biến đại diện thông qua các ký hiệu scope:
+**Import**($Tên_Module)@also%*tên_biến!`scope`:tên_biến
+
+
+                  * Nạp phạm vi Toàn cục (Global Scope): Sử dụng `global`
+**Import**($Random)@also%*random!`global`:random
+
+
+                  * Sử dụng lệnh trực tiếp từ Module nạp:
+<random>^(10, 100)*ran   | Tạo số ngẫu nhiên từ 10 đến 100 và gán vào *ran |
+
+
+VII. LẬP TRÌNH HƯỚNG ĐỐI TƯỢNG (OOP)
+1. Định nghĩa Class & Tầm truy cập (Access Control)
+                     * Class: Định nghĩa bằng thẻ !class [ ].
+                     * Public: Mặc định mọi thuộc tính và hàm nằm trực tiếp trong !class đều là Public (không cần khai báo @public).
+                     * Private: Đóng gói tất cả thuộc tính/hàm riêng tư vào khối @private [ ].
+                     * Phương thức: Khai báo trực tiếp tên_hàm() [ ] không sử dụng từ khóa <def>.
+Monster !class [
+
+   | Khối thuộc tính & phương thức riêng tư |
+   @private [
+       string("Dragon")*name
+       int(100)*hp
+
+       take_damage() [
+           int(<$random>(15, 35))*damage
+           <now>(hp - damage)>hp
+
+           <if>(hp > 50) [
+               <printf>^("Monster {name} is healthy! HP: {hp}")
+           ]
+           <elif>(hp > 0) [
+               <printf>^("Monster {name} is wounded! HP: {hp}")
+           ]
+           <else> [
+               <printf>^("Monster {name} is dead!")
+           ]
+       ]
+   ]
+]
+
+
+2. Khởi tạo & Gọi Phương thức (Instance & Method Call)
+                     * Khởi tạo Instance: *Tên_Class*tên_đối_tượng
+                     * Gọi phương thức: $tên_đối_tượng*tên_phương_thức()
+[
+   *Monster*m1           | Khởi tạo instance m1 |
+   $m1*take_damage()     | Gọi phương thức take_damage của m1 |
+]
+
+
+VIII. CHƯƠNG TRÌNH MẪU HOÀN CHỈNH
+Dưới đây là một chương trình .ko hoàn chỉnh tích hợp toàn bộ các tính năng: Import Global, Class, Input/Output, Random, Rẽ nhánh đa điều kiện <elif>, Cập nhật trạng thái <now>:
+| 1. Nạp thư viện Random toàn cục |
+**Import**($Random)@also%*random!`global`:random
+
+| 2. Định nghĩa Lớp Hero |
+Hero !class [
+   @private [
+       string("")*name
+       int(100)*hp
+       ('Kiem', 'Khien', 'Binh mau')*inventory
+
+       setup_player() [
+           <input>("Nhap ten anh hung cua ban: ")&=name
+           <printf>^("Chao mung anh hung {name} den voi the gioi .ko!")
+       ]
+
+       use_random_item() [
+           int(<$random>(0, 2))*item_index
+           <printf>^("Hero {name} used item: {inventory<{item_index}>}")
+       ]
+
+       check_status() [
+           <if>(hp >= 80) [
+               <printf>^("Trang thai: Rat khoe")
+           ]
+           <elif>(hp >= 30) [
+               <printf>^("Trang thai: Binh thuong")
+           ]
+           <else> [
+               <printf>^("Trang thai: Nguy hiem!")
+           ]
+       ]
+   ]
+]
+
+| 3. Khối thực thi chính |
+[
+   *Hero*p1
+   $p1*setup_player()
+   $p1*use_random_item()
+   $p1*check_status()
+]

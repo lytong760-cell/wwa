@@ -1,4 +1,6 @@
+import random
 def data_types():
+
     string = "String "
     Int = 10
     floating = 10.5
@@ -79,6 +81,43 @@ def format_string():
     ### We can arrange the location Start from 0, not 1
     txt_3 = "My father is {1}, and I am {0}"
     print(txt_3.format(my_age, father_age))
+def string_formatting():
+    name = "John"
+    age = 10
+    txt_4 = f"My name is {name}, and I am {age}"
+    print(txt_4)                          
+def trie() :
+    #find "you" , "your ", "Yes" by  trie
+
+    strring_find = "y" 
+    while strring_find == "you" and strring_find == "your" and strring_find == "Yes":
+        find = random.choice(["right", "left"])
+        if find == "right":
+            string_find = "yo"
+            if find == "right":
+                string_find = "you"
+                print("You found 'you' in the right branch of the trie.")
+                if find == "right":
+                    string_find = "your"
+                    print("You found 'your' in the right branch of the trie.")
+                
+                    
+                else : 
+                    None
+            else : 
+                None
+        else:
+            string_find = "Ye"
+            if find == "right":
+                string_find = "Yes"
+                print("You found 'Yes' in the right branch of the trie.")
+            else :  
+                None
+
+
+        
+    
+
 
 if __name__ == "__main__":    
     print_values()
@@ -89,3 +128,6 @@ if __name__ == "__main__":
     in_string()
     not_in_string()
     format_string()
+    string_formatting()
+
+    trie()

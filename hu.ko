@@ -1,0 +1,13 @@
+[
+    **Loop**<for>(*i+1) [
+        <if>(i%2 == 0) [
+            <printf>^("{i} chẵn")
+
+        ]
+        <else> [
+            <printf>^("{i} lẻ )
+        ]
+        
+    ]
+
+]

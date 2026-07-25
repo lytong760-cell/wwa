@@ -1,0 +1,44 @@
+**Import**($Random)@also%*random!`global`:random
+
+show_welcome_message() [
+    <printf>^("=== CHÀO MỪNG ĐẾN VỚI GAME .KO ===")
+]
+
+Hero !class [
+    @private [
+        string("")*name
+        int(100)*hp
+        ('Kiem', 'Khien', 'Binh mau')*inventory
+
+        setup_player() [
+            <input>("Nhap ten anh hung cua ban: ")&=name
+            <printf>^("Chao mung anh hung {name} den voi the gioi .ko!")
+        ]
+
+        use_random_item() [
+            int(<$random>(0, 2))*item_index
+            <printf>^("Hero {name} used item: {inventory<{item_index}>}")
+        ]
+
+        check_status() [
+            <if>(hp >= 80) [
+                <printf>^("Trang thai: Rat khoe")
+            ]
+            <elif>(hp >= 30) [
+                <printf>^("Trang thai: Binh thuong")
+            ]
+            <else> [
+                <printf>^("Trang thai: Nguy hiem!")
+            ]
+        ]
+    ]
+]
+
+[
+    *show_welcome_message()
+    
+    *Hero*p1
+    $p1*setup_player()
+    $p1*use_random_item()
+    $p1*check_status()
+]

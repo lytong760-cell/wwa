@@ -311,7 +311,6 @@ class Parser:
     def parse_var_decl(self, is_const: bool) -> Node:
         self._advance()
         name = self.expect_value("IDENTIFIER", "Expected identifier")
-        self._advance()
         type_annotation = None
         if self._peek_value("COLON"):
             self._advance()
@@ -327,14 +326,11 @@ class Parser:
     def parse_func_decl(self, is_async: bool = False) -> FuncDecl:
         self._advance()
         name = self.expect_value("IDENTIFIER", "Expected function name")
-        self._advance()
         params = []
         self.expect("LPAREN", "Expected '('")
-        self._advance()
         if not self._peek_value("RPAREN"):
             while True:
                 param_name = self.expect_value("IDENTIFIER", "Expected parameter name")
-                self._advance()
                 type_annotation = None
                 if self._peek_value("COLON"):
                     self._advance()
@@ -345,7 +341,7 @@ class Parser:
                     continue
                 break
         self.expect("RPAREN", "Expected ')'" )
-        self._advance()
+
         return_type = None
         if self._peek_value("ARROW"):
             self._advance()
@@ -357,11 +353,9 @@ class Parser:
         self._advance()
         params = []
         self.expect("LPAREN", "Expected '('")
-        self._advance()
         if not self._peek_value("RPAREN"):
             while True:
                 param_name = self.expect_value("IDENTIFIER", "Expected parameter name")
-                self._advance()
                 type_annotation = None
                 if self._peek_value("COLON"):
                     self._advance()
@@ -372,14 +366,12 @@ class Parser:
                     continue
                 break
         self.expect("RPAREN", "Expected ')'" )
-        self._advance()
         body = self.parse_block()
         return FuncDecl("constructor", params, body, None, False, True)
 
     def parse_class_decl(self) -> ClassDecl:
         self._advance()
         name = self.expect_value("IDENTIFIER", "Expected class name")
-        self._advance()
         base = None
         if self._peek_value("KEYWORD") and self.current().value == "extends":
             self._advance()

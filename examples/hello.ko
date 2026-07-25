@@ -1,0 +1,6 @@
+int(10)*x
+print(x)
+
+if(x > 2) [
+    print("big")
+]
